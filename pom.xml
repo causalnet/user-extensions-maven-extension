@@ -3,7 +3,7 @@
 
     <groupId>au.net.causal.maven.plugins</groupId>
     <artifactId>user-extensions-maven-extension</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>User Extensions Maven Extension</name>
@@ -36,7 +36,8 @@
         <connection>scm:git:git@github.com:causalnet/user-extensions-maven-extension.git</connection>
         <developerConnection>scm:git:git@github.com:causalnet/user-extensions-maven-extension.git</developerConnection>
         <url>https://github.com/causalnet/user-extensions-maven-extension</url>      
-    </scm>
+      <tag>user-extensions-maven-extension-1.0</tag>
+  </scm>
 
     <distributionManagement>
         <snapshotRepository>
