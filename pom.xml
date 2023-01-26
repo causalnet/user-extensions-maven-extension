@@ -24,13 +24,19 @@
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>    	
         <maven.version>3.8.6</maven.version>
         <java.version>8</java.version>
+
+        <!--
+        Set this to true locally to create non-shaded artifact which can be useful for debugging, but unshaded this extension will only
+        work from extensions.xml and not from lib/ext or with MAVEN_OPTS.
+        -->
+        <skipShade>false</skipShade>
     </properties>
 
     <scm>
         <connection>scm:git:git@github.com:causalnet/user-extensions-maven-extension.git</connection>
         <developerConnection>scm:git:git@github.com:causalnet/user-extensions-maven-extension.git</developerConnection>
         <url>https://github.com/causalnet/user-extensions-maven-extension</url>      
-  </scm>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
@@ -71,12 +77,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>${maven.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
             <artifactId>maven-embedder</artifactId>
             <version>${maven.version}</version>
             <scope>provided</scope>
@@ -86,6 +86,20 @@
             <artifactId>maven-plugin-annotations</artifactId>
             <version>3.6.4</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.29.2-GA</version>
+        </dependency>
+
+        <!-- Just to help with debugging -->
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+            <version>2.6.0</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -159,7 +173,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <release>${java.version}</release>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
@@ -191,6 +204,43 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Agent-Class>au.net.causal.maven.plugins.userextensions.UserExtensionsJvmAgent</Agent-Class>
+                            <Premain-Class>au.net.causal.maven.plugins.userextensions.UserExtensionsJvmAgent</Premain-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipShade}</skip>
+                            <relocations>
+                                <relocation>
+                                    <pattern>javassist</pattern>
+                                    <shadedPattern>au.net.causal.maven.plugins.userextensions.shaded.javassist</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
