@@ -53,7 +53,7 @@ The easiest and least invasive way of registering the extension is modifying the
 environment variable to contain:
 
 ```
--javaagent=<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.0/user-extensions-maven-extension-1.0.jar
+-javaagent:<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.0/user-extensions-maven-extension-1.0.jar
 ```
 
 The agent will patch Maven to support user-extensions every time Maven is run.
