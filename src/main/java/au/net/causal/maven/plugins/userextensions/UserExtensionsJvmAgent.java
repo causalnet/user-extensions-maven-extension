@@ -16,16 +16,21 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class UserExtensionsJvmAgent
 {
     public static void premain(String agentArgs, Instrumentation inst)
     {
+        Set<Feature> features = Feature.parseArgs(agentArgs);
+
         inst.addTransformer(new ClassFileTransformer()
         {
             @Override
@@ -47,7 +52,7 @@ public class UserExtensionsJvmAgent
                         classfileBuffer = ctClass.toBytecode();
                         ctClass.detach();
                     }
-                    else if ("org/apache/maven/cli/internal/BootstrapCoreExtensionManager".equals(className))
+                    else if ("org/apache/maven/cli/internal/BootstrapCoreExtensionManager".equals(className) && features.contains(Feature.ENHANCED_INTERPOLATION))
                     {
                         ClassPool classPool = new ClassPool(null);
                         classPool.appendClassPath(new LoaderClassPath(loader));
@@ -139,7 +144,6 @@ public class UserExtensionsJvmAgent
                 if ("org.apache.maven.cli.internal.BootstrapCoreExtensionManager".equals(c.getClassName()) && "resolveExtension".equals(c.getMethodName()))
                 {
                     c.replace(
-                        "System.err.println(\"*** \" + $5.interpolate($1.getVersion())); " +
                         "if (\"disabled\".equalsIgnoreCase($5.interpolate($1.getVersion()))) { $_ = java.util.Collections.emptyList(); }" +
                         "else { $_ = $proceed($$); }"
                     );
@@ -294,6 +298,33 @@ public class UserExtensionsJvmAgent
                 else
                     throw new RuntimeException(e);
             }
+        }
+    }
+
+    public static enum Feature
+    {
+        ENHANCED_INTERPOLATION;
+
+        public static Set<Feature> parseArgs(String args)
+        {
+            EnumSet<Feature> features = EnumSet.noneOf(Feature.class);
+
+            if (args != null)
+            {
+                for (String arg : args.split(Pattern.quote("\\s+,\\s+")))
+                {
+                    try
+                    {
+                        features.add(Feature.valueOf(arg.toUpperCase(Locale.ROOT)));
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        System.err.println("Warning: unknown user-extensions agent feature: " + arg);
+                    }
+                }
+            }
+
+            return features;
         }
     }
 }
