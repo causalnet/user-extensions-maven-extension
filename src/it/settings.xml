@@ -13,6 +13,21 @@
 
     <profiles>
         <profile>
+            <id>extensions-disabled-by-default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <servers-extension.version>disabled</servers-extension.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>servers-extension</id>
+            <properties>
+                <servers-extension.version>1.3.1</servers-extension.version>
+            </properties>
+        </profile>
+        <profile>
             <id>it-repo</id>
             <activation>
                 <activeByDefault>true</activeByDefault>

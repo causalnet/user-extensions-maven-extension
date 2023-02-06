@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>au.net.causal.maven.plugins.user-extensions-maven-extension.it</groupId>
+    <artifactId>enhanced-interpolation-extension-disabled</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>User Extensions Testing Project</name>
+    <description>
+        Tests the enhanced interpolation feature.
+    </description>
+
+    <properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <serversfile>server-passwords.properties</serversfile>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>ant-test-script</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <!--
+                            Generate a target/server-passwords.properties file with some credentials made available thanks to the servers extension.
+                            The servers extension is not loaded by default (it has version of 'disabled' by default) but with
+                            can be enabled through a profile that sets the extension version through a property override.
+                            -->
+                            <target unless="maven.test.skip">
+                                <propertyfile file="${project.build.directory}/${serversfile}">
+                                    <entry key="testServerUser" value="${settings.servers.testServer.username}" />
+                                    <entry key="testServerPassword" value="${settings.servers.testServer.password}" />
+                                </propertyfile>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

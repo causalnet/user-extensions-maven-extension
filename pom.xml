@@ -257,7 +257,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/it-userhome</outputDirectory>
+                            <outputDirectory>${project.build.directory}/it-userhomes</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/itdata</directory>

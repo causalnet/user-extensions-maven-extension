@@ -1,0 +1,10 @@
+<extensions xmlns="http://maven.apache.org/EXTENSIONS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.0.0 http://maven.apache.org/xsd/core-extensions-1.0.0.xsd">
+    <!-- Load this globally for all Maven projects -->
+    <!-- Wouldn't typically do this for the servers extension but we're just testing that user-global extensions work -->
+    <extension>
+        <groupId>com.github.shyiko.servers-maven-extension</groupId>
+        <artifactId>servers-maven-extension</artifactId>
+        <version>${servers-extension.version}</version>
+    </extension>
+</extensions>
