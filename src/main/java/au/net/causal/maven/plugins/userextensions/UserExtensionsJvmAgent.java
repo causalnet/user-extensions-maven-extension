@@ -175,6 +175,7 @@ public class UserExtensionsJvmAgent
                     "request.setInactiveProfileIds($1.getInactiveProfiles());" +
                     "request.setSystemProperties($1.getSystemProperties());" +
                     "request.setUserProperties($1.getUserProperties());" +
+                    "request.setRawModel(new org.apache.maven.model.Model());" +
                     "org.apache.maven.model.building.ModelBuildingResult result = null;" +
                     "try {" +
                     "  result = builder.build(request);" +
