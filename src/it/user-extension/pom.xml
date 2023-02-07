@@ -36,6 +36,7 @@
                                 <propertyfile file="${project.build.directory}/server-passwords.properties">
                                     <entry key="testServerUser" value="${settings.servers.testServer.username}" />
                                     <entry key="testServerPassword" value="${settings.servers.testServer.password}" />
+                                    <entry key="mavenVersion" value="${maven.version}" />
                                 </propertyfile>
                             </target>
                         </configuration>
