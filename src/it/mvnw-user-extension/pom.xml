@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>au.net.causal.maven.plugins.user-extensions-maven-extension.it</groupId>
+    <artifactId>mvnw-user-extension</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>User Extensions Testing Project</name>
+    <description>
+        Load a global-user extension from the .m2/extensions.xml and verify it actually loaded.
+        Uses Maven Wrapper to test different Maven versions as well as whether the agent
+        works with Maven Wrapper itself (possible classloading issues).
+    </description>
+
+    <properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Overridden by each invoker build -->
+        <passwordsfilename>server-passwords.properties</passwordsfilename>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>ant-test-script</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <!--
+                            Generate a target/server-passwords.properties file with some credentials made available thanks to the servers extension.
+                            The servers extension is loaded only from .m2/extensions.xml so that extension will only load if our extension works.
+                            -->
+                            <target unless="maven.test.skip">
+                                <propertyfile file="${project.build.directory}/${passwordsfilename}.properties">
+                                    <entry key="testServerUser" value="${settings.servers.testServer.username}" />
+                                    <entry key="testServerPassword" value="${settings.servers.testServer.password}" />
+                                    <entry key="mavenVersion" value="${maven.version}" />
+                                </propertyfile>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
