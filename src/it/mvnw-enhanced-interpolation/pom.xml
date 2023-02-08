@@ -2,12 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>au.net.causal.maven.plugins.user-extensions-maven-extension.it</groupId>
-    <artifactId>enhanced-interpolation</artifactId>
+    <artifactId>mvnw-enhanced-interpolation</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>User Extensions Testing Project</name>
     <description>
-        Tests the enhanced interpolation feature.
+        Tests the enhanced interpolation feature with Maven wrapper and multiple different
+        Maven versions.
     </description>
 
     <properties>
