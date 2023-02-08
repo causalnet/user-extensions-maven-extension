@@ -3,8 +3,7 @@
 
 //Each different Maven version tested generated a different file name, check each one
 
-//TODO make it work with earlier Maven versions - enhanced interpolation doesn't work in 3.6.3 or earlier
-['3.9.0', '3.8.7' /*, '3.6.3', '3.5.4'*/].each { mavenVersion ->
+['3.9.0', '3.8.7', '3.8.5'].each { mavenVersion ->
     File serverPasswordsFile = new File(basedir, "target/server-passwords-${mavenVersion}.properties")
     Properties serverPasswords = new Properties()
     serverPasswordsFile.withInputStream {
