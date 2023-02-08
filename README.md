@@ -25,9 +25,8 @@ the project directory, which Maven will handle, download depedencies, etc.
 Unfortunately this only works per-project.  There are some extensions that need to be 
 registered for all builds (for example, a new Wagon provider or a custom password decrypter).
 
-Once this extension is registered, you will be able to put an `extensions.xml` file in your
-`<user home>/.m2` directory and it will be used to load extensions, but will be used 
-every Maven build.
+Once the user-extensions-maven-extension is registered, you will be able to put an `extensions.xml` file in your
+`<user home>/.m2` directory and it will be used to load extensions for every Maven build.
 
 ## Requirements
 
