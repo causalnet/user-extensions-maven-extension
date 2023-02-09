@@ -6,7 +6,8 @@ unreleased
 - Fix extension breaking when running under Maven wrapper due to classloader isolation
   differences
 - Add enhanced interpolation feature that allows properties to be sourced from profiles in 
-  settings.xml.
+  settings.xml
+- Improve backwards compatibility back to Maven 3.3.1 
 
 ### 1.0
 2023-01-26

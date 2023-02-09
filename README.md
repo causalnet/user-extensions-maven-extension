@@ -30,7 +30,7 @@ Once the user-extensions-maven-extension is registered, you will be able to put 
 
 ## Requirements
 
-- Maven 3.5.0 or later (tested up to Maven 3.9.0)
+- Maven 3.3.1 or later (tested up to Maven 3.9.0)
 - Java 8 or later
 
 ## Installation
