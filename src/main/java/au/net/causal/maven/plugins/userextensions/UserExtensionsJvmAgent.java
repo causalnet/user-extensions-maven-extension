@@ -128,9 +128,14 @@ public class UserExtensionsJvmAgent
 
 
                             //Now try a user-global extensions.xml file, if it exists
-                            //"System.err.println(\"userProperties: \" + cliRequest.userProperties);" +
-                            //TODO support reading the user extensions.xml location from properties
-                            "if (new java.io.File(" + userMavenConfigurationHomeFieldName + ", \"extensions.xml\").isFile()) { $_.addAll($proceed(new java.io.File(" + userMavenConfigurationHomeFieldName + ", \"extensions.xml\"))); } " +
+                            "String userExtensionsFileName = System.getProperty(\"maven.user.extensions\");" +
+                            "java.io.File userExtensionsFile;" +
+                            "if (userExtensionsFileName != null) { " +
+                            "    userExtensionsFile = new java.io.File(userExtensionsFileName);" +
+                            "} else { " +
+                            "    userExtensionsFile = new java.io.File(" + userMavenConfigurationHomeFieldName + ", \"extensions.xml\");" +
+                            "} " +
+                            "if (userExtensionsFile.isFile()) { $_.addAll($proceed(userExtensionsFile)); } " +
 
                             //Deduplicate extensions that might have same groupId/artifactId but different versions.  First one in the list wins.
                             //This is so that extensions added at project level can override the versions of user-global extensions with different versions if needed.
