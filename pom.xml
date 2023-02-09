@@ -353,6 +353,31 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>it-latest-maven</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>integration-test-latest-maven</id>
+                                <goals>
+                                    <goal>install</goal>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <cloneProjectsTo>${project.build.directory}/it-latest-maven</cloneProjectsTo>
+                                    <projectsDirectory>src/it-latest-maven</projectsDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Only make GPG signatures during release -->
         <profile>
             <id>release</id>
