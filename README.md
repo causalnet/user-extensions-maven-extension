@@ -131,6 +131,12 @@ profile 'usemyextension' is turned on in builds, which is simple as running
 Maven with `-Pusemyextension`.
 
 
+## Custom user extensions location
+
+By default, the user's `extensions.xml` file is under the `.m2` directory alongside
+the local repository and `settings.xml`.  This can be changed by setting the 
+`maven.user.extensions` system property to another extensions file name.
+
 ## Building
 
 To build the project, run:
