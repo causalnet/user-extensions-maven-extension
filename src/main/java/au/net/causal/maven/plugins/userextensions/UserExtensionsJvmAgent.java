@@ -172,44 +172,34 @@ public class UserExtensionsJvmAgent
     private static void transformCreateInterpolatorMethod(CtMethod m)
     throws CannotCompileException
     {
-        try
-        {
-            m.addLocalVariable("i", m.getDeclaringClass().getClassPool().get("java.util.ListIterator"));
-            m.addLocalVariable("p", m.getDeclaringClass().getClassPool().get("org.apache.maven.model.Profile"));
-            m.addLocalVariable("p2", m.getDeclaringClass().getClassPool().get("java.util.Properties"));
-            m.insertAfter(
-                    "org.apache.maven.model.building.DefaultModelBuilder builder = new org.apache.maven.model.building.DefaultModelBuilderFactory().newInstance();" +
+        m.insertAfter(
+                "org.apache.maven.model.building.DefaultModelBuilder builder = new org.apache.maven.model.building.DefaultModelBuilderFactory().newInstance();" +
 
-                    //Don't care that this model building fails (using a directory as POM file) but we want to grab the active profiles from the exception at the end
-                    //and that gets resolved whether the POM file is real or not
-                    "org.apache.maven.model.building.DefaultModelBuildingRequest request = new org.apache.maven.model.building.DefaultModelBuildingRequest().setPomFile(new java.io.File(\".\"));" +
-                    "request.setProfiles($1.getProfiles());" +
-                    "request.setActiveProfileIds($1.getActiveProfiles());" +
-                    "request.setInactiveProfileIds($1.getInactiveProfiles());" +
-                    "request.setSystemProperties($1.getSystemProperties());" +
-                    "request.setUserProperties($1.getUserProperties());" +
-                    "request.setRawModel(new org.apache.maven.model.Model());" +
-                    "org.apache.maven.model.building.ModelBuildingResult result = null;" +
-                    "try {" +
-                    "  result = builder.build(request);" +
-                    "} catch (org.apache.maven.model.building.ModelBuildingException ex) {" +
-                    "  result = ex.getResult();" +
-                    "} " +
-                    "java.util.List activeProfiles = result.getActiveExternalProfiles();" +
+                //Don't care that this model building fails (using a directory as POM file) but we want to grab the active profiles from the exception at the end
+                //and that gets resolved whether the POM file is real or not
+                "org.apache.maven.model.building.DefaultModelBuildingRequest request = new org.apache.maven.model.building.DefaultModelBuildingRequest().setPomFile(new java.io.File(\".\"));" +
+                "request.setProfiles($1.getProfiles());" +
+                "request.setActiveProfileIds($1.getActiveProfiles());" +
+                "request.setInactiveProfileIds($1.getInactiveProfiles());" +
+                "request.setSystemProperties($1.getSystemProperties());" +
+                "request.setUserProperties($1.getUserProperties());" +
+                "request.setRawModel(new org.apache.maven.model.Model());" +
+                "org.apache.maven.model.building.ModelBuildingResult result = null;" +
+                "try {" +
+                "  result = builder.build(request);" +
+                "} catch (org.apache.maven.model.building.ModelBuildingException ex) {" +
+                "  result = ex.getResult();" +
+                "} " +
+                "java.util.List activeProfiles = result.getActiveExternalProfiles();" +
 
-                    //Now we have resolved active profiles, add value sources in reverse order
-                    //This is the way Maven works as well normally for properties in multiple profiles (later profiles should win), tested with Antrun
-                    "for (i = activeProfiles.listIterator(activeProfiles.size()); i.hasPrevious();) { " +
-                    "   p = i.previous();" +
-                    "   p2 = org.apache.maven.model.Profile.class.getMethod(\"getProperties\", null).invoke(p, null);" +
-                    "   $_.addValueSource(new org.codehaus.plexus.interpolation.MapBasedValueSource(p2));" +
-                    "}"
-            );
-        }
-        catch (NotFoundException e)
-        {
-            throw new CannotCompileException(e);
-        }
+                //Now we have resolved active profiles, add value sources in reverse order
+                //This is the way Maven works as well normally for properties in multiple profiles (later profiles should win), tested with Antrun
+                "for (java.util.ListIterator i = activeProfiles.listIterator(activeProfiles.size()); i.hasPrevious();) { " +
+                "   org.apache.maven.model.Profile p = i.previous();" +
+                "   java.util.Properties p2 = org.apache.maven.model.Profile.class.getMethod(\"getProperties\", null).invoke(p, null);" +
+                "   $_.addValueSource(new org.codehaus.plexus.interpolation.MapBasedValueSource(p2));" +
+                "}"
+        );
     }
 
     public static enum Feature
