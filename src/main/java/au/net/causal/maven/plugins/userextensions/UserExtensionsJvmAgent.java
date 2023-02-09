@@ -106,6 +106,19 @@ public class UserExtensionsJvmAgent
                 // - if user-global extensions.xml in .m2 directory exists, cal readCoreExtensionsDescriptor() with this file and save results to list
                 else if ("org.apache.maven.cli.MavenCli".equals(c.getClassName()) && "readCoreExtensionsDescriptor".equals(c.getMethodName()))
                 {
+                    //Determine name of userMavenConfigurationHome public static variable
+                    //it changes name from Maven 3.3.9 to 3.5.0
+                    String userMavenConfigurationHomeFieldName;
+                    try
+                    {
+                        userMavenConfigurationHomeFieldName = m.getDeclaringClass().getField("USER_MAVEN_CONFIGURATION_HOME").getName();
+                    }
+                    catch (NotFoundException e)
+                    {
+                        //Maven 3.3.9 and earlier
+                        userMavenConfigurationHomeFieldName = "userMavenConfigurationHome";
+                    }
+
                     c.replace(
                             //Initialize list
                             "$_ = new java.util.ArrayList(); " +
@@ -117,7 +130,7 @@ public class UserExtensionsJvmAgent
                             //Now try a user-global extensions.xml file, if it exists
                             //"System.err.println(\"userProperties: \" + cliRequest.userProperties);" +
                             //TODO support reading the user extensions.xml location from properties
-                            "if (new java.io.File(USER_MAVEN_CONFIGURATION_HOME, \"extensions.xml\").isFile()) { $_.addAll($proceed(new java.io.File(USER_MAVEN_CONFIGURATION_HOME, \"extensions.xml\"))); } " +
+                            "if (new java.io.File(" + userMavenConfigurationHomeFieldName + ", \"extensions.xml\").isFile()) { $_.addAll($proceed(new java.io.File(" + userMavenConfigurationHomeFieldName + ", \"extensions.xml\"))); } " +
 
                             //Deduplicate extensions that might have same groupId/artifactId but different versions.  First one in the list wins.
                             //This is so that extensions added at project level can override the versions of user-global extensions with different versions if needed.
