@@ -1,7 +1,7 @@
 # Change Log
 
 ### 1.1
-unreleased
+2023-02-12
 
 - Fix extension breaking when running under Maven wrapper due to classloader isolation
   differences
