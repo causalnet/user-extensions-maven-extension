@@ -11,19 +11,26 @@ import javassist.expr.MethodCall;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
+import java.net.JarURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 public class UserExtensionsJvmAgent
 {
     public static void premain(String agentArgs, Instrumentation inst)
     {
+        System.err.println("Starting agent: " + getAgentJarFilePath());
+
         Set<Feature> features = Feature.parseArgs(agentArgs);
 
         inst.addTransformer(new ClassFileTransformer()
@@ -59,6 +66,19 @@ public class UserExtensionsJvmAgent
 
                         CtMethod createInterpolatorMethod = ctClass.getDeclaredMethod("createInterpolator");
                         transformCreateInterpolatorMethod(createInterpolatorMethod);
+
+                        classfileBuffer = ctClass.toBytecode();
+                        ctClass.detach();
+                    }
+                    else if ("org/jetbrains/idea/maven/server/MavenServerCMDState".equals(className) && features.contains(Feature.IDEA))
+                    {
+                        ClassPool classPool = new ClassPool(null);
+                        classPool.appendClassPath(new LoaderClassPath(loader));
+
+                        CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+
+                        CtMethod createJavaParametersMethod = ctClass.getDeclaredMethod("createJavaParameters");
+                        transformCreateJavaParametersMethod(createJavaParametersMethod);
 
                         classfileBuffer = ctClass.toBytecode();
                         ctClass.detach();
@@ -207,9 +227,65 @@ public class UserExtensionsJvmAgent
         );
     }
 
+    private static void transformCreateJavaParametersMethod(CtMethod m)
+    throws CannotCompileException
+    {
+        //Determine the JAR we are running from
+        String agentJarFile = getAgentJarFilePath();
+        if (agentJarFile == null)
+        {
+            System.err.println("Warning: could not determine path of agent JAR file.");
+            return;
+        }
+        //TODO better escaping
+        String agentJarFileEscaped = agentJarFile.replace("\\", "\\\\").replace("\"", "\\\"");
+
+        //TODO pass through agent options
+        m.insertAfter(
+                "$_.getVMParametersList().add(\"-javaagent:" + agentJarFileEscaped + "\");"
+        );
+    }
+
+    private static String getAgentJarFilePath()
+    {
+        URL res = UserExtensionsJvmAgent.class.getResource(UserExtensionsJvmAgent.class.getSimpleName() + ".class");
+        if (res == null)
+            return null;
+        if (!res.toString().startsWith("jar:file:"))
+            return null;
+
+        try
+        {
+            //Intellij clobbers JAR URL handler - we can't rely on it being there
+            //Manually make a JarURLConnection just so we can use the code that grabs the parent JAR file of the resource
+            JarURLConnection con = new JarURLConnection(res)
+            {
+                @Override
+                public JarFile getJarFile() throws IOException
+                {
+                    throw new Error("not used");
+                }
+
+                @Override
+                public void connect() throws IOException
+                {
+                    throw new Error("not used");
+                }
+            };
+            return new File(con.getJarFileURL().toURI()).getAbsolutePath();
+        }
+        catch (IOException | URISyntaxException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public static enum Feature
     {
-        ENHANCED_INTERPOLATION;
+        ENHANCED_INTERPOLATION,
+        IDEA;
 
         public static Set<Feature> parseArgs(String args)
         {
