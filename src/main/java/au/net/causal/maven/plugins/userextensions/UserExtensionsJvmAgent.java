@@ -29,8 +29,6 @@ public class UserExtensionsJvmAgent
 {
     public static void premain(String agentArgs, Instrumentation inst)
     {
-        System.err.println("Starting agent: " + getAgentJarFilePath());
-
         Set<Feature> features = Feature.parseArgs(agentArgs);
 
         inst.addTransformer(new ClassFileTransformer()
@@ -227,6 +225,10 @@ public class UserExtensionsJvmAgent
         );
     }
 
+    /**
+     * Patch some IntelliJ Maven code that runs its Maven server so that it always adds our agent when running.  This makes it easier to use for users
+     * since they don't have to edit every project and put the parameter for this agent in.
+     */
     private static void transformCreateJavaParametersMethod(CtMethod m)
     throws CannotCompileException
     {

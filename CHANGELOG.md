@@ -1,4 +1,10 @@
 # Change Log
+### 1.2
+unreleased
+
+- Add ability to patch IntelliJ's Maven server so the user extensions agent always runs
+  when doing things like resolving dependencies (important for extensions that 
+  add additional decryptors for example)
 
 ### 1.1
 2023-02-12
