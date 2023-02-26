@@ -24,13 +24,26 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class UserExtensionsJvmAgent
 {
+    private final Set<Feature> features;
+
     public static void premain(String agentArgs, Instrumentation inst)
     {
         Set<Feature> features = Feature.parseArgs(agentArgs);
+        UserExtensionsJvmAgent agent = new UserExtensionsJvmAgent(features);
+        agent.run(inst);
+    }
 
+    public UserExtensionsJvmAgent(Set<Feature> features)
+    {
+        this.features = EnumSet.copyOf(features);
+    }
+
+    public void run(Instrumentation inst)
+    {
         inst.addTransformer(new ClassFileTransformer()
         {
             @Override
@@ -91,7 +104,7 @@ public class UserExtensionsJvmAgent
         });
     }
 
-    private static void transformLoadCoreExtensionsMethod(CtMethod m)
+    private void transformLoadCoreExtensionsMethod(CtMethod m)
     throws CannotCompileException
     {
         m.instrument(new ExprEditor()
@@ -172,7 +185,7 @@ public class UserExtensionsJvmAgent
         });
     }
 
-    private static void transformResolveCoreExtensionsMethod(CtMethod m)
+    private void transformResolveCoreExtensionsMethod(CtMethod m)
     throws CannotCompileException
     {
         m.instrument(new ExprEditor()
@@ -192,7 +205,7 @@ public class UserExtensionsJvmAgent
         });
     }
 
-    private static void transformCreateInterpolatorMethod(CtMethod m)
+    private void transformCreateInterpolatorMethod(CtMethod m)
     throws CannotCompileException
     {
         m.insertAfter(
@@ -229,7 +242,7 @@ public class UserExtensionsJvmAgent
      * Patch some IntelliJ Maven code that runs its Maven server so that it always adds our agent when running.  This makes it easier to use for users
      * since they don't have to edit every project and put the parameter for this agent in.
      */
-    private static void transformCreateJavaParametersMethod(CtMethod m)
+    private void transformCreateJavaParametersMethod(CtMethod m)
     throws CannotCompileException
     {
         //Determine the JAR we are running from
@@ -239,16 +252,21 @@ public class UserExtensionsJvmAgent
             System.err.println("Warning: could not determine path of agent JAR file.");
             return;
         }
-        //TODO better escaping
+        //TODO better escaping for weird file names needed?
         String agentJarFileEscaped = agentJarFile.replace("\\", "\\\\").replace("\"", "\\\"");
 
-        //TODO pass through agent options
+        Set<Feature> passThroughFeatures = EnumSet.copyOf(features);
+        passThroughFeatures.remove(Feature.IDEA);
+        String featureString = passThroughFeatures.stream().map(Feature::name).collect(Collectors.joining(","));
+        if (!featureString.isEmpty())
+            featureString = "=" + featureString;
+
         m.insertAfter(
-                "$_.getVMParametersList().add(\"-javaagent:" + agentJarFileEscaped + "\");"
+                "$_.getVMParametersList().add(\"-javaagent:" + agentJarFileEscaped + featureString + "\");"
         );
     }
 
-    private static String getAgentJarFilePath()
+    private String getAgentJarFilePath()
     {
         URL res = UserExtensionsJvmAgent.class.getResource(UserExtensionsJvmAgent.class.getSimpleName() + ".class");
         if (res == null)
