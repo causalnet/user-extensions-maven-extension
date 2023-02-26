@@ -1,6 +1,6 @@
 # Change Log
 ### 1.2
-unreleased
+2023-02-26
 
 - Add ability to patch IntelliJ's Maven server so the user extensions agent always runs
   when doing things like resolving dependencies (important for extensions that 
