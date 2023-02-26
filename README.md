@@ -43,7 +43,7 @@ This can be done easily through Maven itself, downloading the extension Maven Ce
 local repository with:
 
 ```
-mvn dependency:get -Dartifact=au.net.causal.maven.plugins:user-extensions-maven-extension:1.1
+mvn dependency:get -Dartifact=au.net.causal.maven.plugins:user-extensions-maven-extension:1.2
 ```
 
 ### Configuring Maven
@@ -52,7 +52,7 @@ The easiest and least invasive way of registering the extension is modifying the
 environment variable to contain:
 
 ```
--javaagent:<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.1/user-extensions-maven-extension-1.1.jar
+-javaagent:<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.2/user-extensions-maven-extension-1.2.jar
 ```
 
 The agent will patch Maven to support user-extensions every time Maven is run.
@@ -65,6 +65,23 @@ if the internals change too much.   It's been tested to work with Maven versions
 
 That being said, maybe future versions of Maven get this feature built-in and this extension won't be needed any more?
 
+## IntelliJ integration
+
+The agent can also be configured for enhanced integration with IntelliJ IDEA.  This is only
+needed for running user extensions under IntelliJ's Maven server, which performs indexing
+and dependency downloading - this might be needed if your Maven extensions affects this
+functionality, such as registering additional password decryptors.
+
+By default, any agents registered under MAVEN_OPTS are _not_ passed through to IntelliJ's 
+Maven servers.
+
+To register, edit your IntelliJ VM options (Help | Edit Custom VM Options... can do it)
+and add:
+
+```
+-javaagent:<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.2/user-extensions-maven-extension-1.2.jar=IDEA
+```
+
 ## Enhanced interpolation feature
 
 An optional feature that can be optionally enabled allows properties in your `extensions.xml`
@@ -76,7 +93,7 @@ To enable enhanced interpolation, add the option `enhanced_interpolation` to the
 command line argument.  This would make your `MAVEN_OPTS` become:
 
 ```
--javaagent:<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.1/user-extensions-maven-extension-1.1.jar=enhanced_interpolation
+-javaagent:<your m2 directory>/repository/au/net/causal/maven/plugins/user-extensions-maven-extension/1.2/user-extensions-maven-extension-1.2.jar=enhanced_interpolation
 ```
 
 ### Should I use enhanced interpolation?
