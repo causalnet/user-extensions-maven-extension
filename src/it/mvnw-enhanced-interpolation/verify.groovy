@@ -3,7 +3,7 @@
 
 //Each different Maven version tested generated a different file name, check each one
 
-['3.9.0', '3.8.7', '3.8.5'].each { mavenVersion ->
+['3.9.1', '3.8.7', '3.8.5'].each { mavenVersion ->
     File serverPasswordsFile = new File(basedir, "target/server-passwords-${mavenVersion}.properties")
     Properties serverPasswords = new Properties()
     serverPasswordsFile.withInputStream {

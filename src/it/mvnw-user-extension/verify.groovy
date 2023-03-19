@@ -2,7 +2,7 @@
 //The servers extension is only loaded because our user-extensions extension loads it from .m2/extensions.xml
 
 //Each different Maven version tested generated a different file name, check each one
-['3.9.0', '3.8.7', '3.6.3', '3.5.4', '3.3.9', '3.3.1'].each { mavenVersion ->
+['3.9.1', '3.8.7', '3.6.3', '3.5.4', '3.3.9', '3.3.1'].each { mavenVersion ->
     File serverPasswordsFile = new File(basedir, "target/server-passwords-${mavenVersion}.properties")
     Properties serverPasswords = new Properties()
     serverPasswordsFile.withInputStream {
