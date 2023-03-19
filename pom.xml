@@ -370,6 +370,7 @@
                                 <configuration>
                                     <cloneProjectsTo>${project.build.directory}/it-latest-maven</cloneProjectsTo>
                                     <projectsDirectory>src/it-latest-maven</projectsDirectory>
+                                    <reportsDirectory>${project.build.directory}/invoker-reports-latest-maven</reportsDirectory>
                                 </configuration>
                             </execution>
                         </executions>
